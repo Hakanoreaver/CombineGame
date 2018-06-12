@@ -7,13 +7,13 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     private Timer timer;
     private boolean ingame;
     private final int B_WIDTH = 1920;
-    private final int B_HEIGHT = 1080;
+    private final int B_HEIGHT = 880;
     private final int DELAY = 16;
     ArrayList<Box> boxes;
     int offsetX, offsetY;
     Box dragging;
     boolean drag = false;
-    int count = 0, spawnPeriod = 120;
+    int count = 0, spawnPeriod = 60, points = 0;
 
     public Board() {
         initBoard();
@@ -23,26 +23,30 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     private void initBoard() {
         setFocusable(true);
         setBackground(Color.BLACK);
+        this.setLayout(null);
         ingame = true;
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
-
+        initBoxes();
+        initMenus();
         timer = new Timer(DELAY, this);
         timer.start();
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        initBoxes();
-        initMenus();
+
     }
 
     private void initMenus() {
-
+        JPanel temp = new JPanel();
+        temp.setBackground(Color.DARK_GRAY);
+        JButton button = new JButton("Button");
+        temp.add(button);
+        temp.setBounds(0, 880, 1920, 200);
+        this.add(temp);
     }
 
     public void initBoxes() {
         boxes = new ArrayList<>();
-        boxes.add(new Box(500,500, 3));
-        boxes.add(new Box(400,400, 4));
 
     }
 
@@ -76,11 +80,11 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
                     break;
             }
             g.fillRect(b.getX(), b.getY(), b.height, b.width);
-
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("TimesRoman", Font.PLAIN, 16));
-            g.drawString("Cubes : " + boxes.size(), 50,50);
         }
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 16));
+        g.drawString("Cubes : " + boxes.size(), 50,50);
+        g.drawString("Points : " + points, 50, 100);
     }
 
     private void collisions() {
@@ -132,26 +136,29 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
         count = 0;
         boolean add = true;
         for (Box b : boxes) {
-            if (b.getX() == 100 && b.getY() == 100) {
+            if (b.getX() == B_WIDTH/2 && b.getY() == B_HEIGHT/2) {
                 add = false;
             }
         }
         if (add) {
-            boxes.add(new Box( 100, 100, 1));
+            boxes.add(new Box( B_WIDTH/2, B_HEIGHT/2, 1));
         }
     }
 
     private void calcCoins() {
-
+        for (Box b : boxes) {
+            points += b.level * 2 - 1;
+        }
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         collisions();
         update();
-        if (count == 60) {
+        if (count%60 == 0) {
             calcCoins();
         }
-        if(count == 120) {
+        if(count == spawnPeriod) {
             spawnBox();
         }
         count++;
@@ -172,6 +179,7 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     public void mouseReleased(MouseEvent e) {
         drag = false;
         dragging = null;
+        System.out.println("pressed");
     }
     public void mouseEntered(MouseEvent e) {
 
@@ -183,7 +191,7 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
 
     }
     public void mouseClicked(MouseEvent e) {
-
+        System.out.println("cicked");
     }
     public void mouseDragged(MouseEvent e) {
         try {
