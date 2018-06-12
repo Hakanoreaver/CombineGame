@@ -13,7 +13,7 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     int offsetX, offsetY;
     Box dragging;
     boolean drag = false;
-    int count = 0;
+    int count = 0, spawnPeriod = 120;
 
     public Board() {
         initBoard();
@@ -32,12 +32,18 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
         addMouseMotionListener(this);
 
         initBoxes();
+        initMenus();
+    }
+
+    private void initMenus() {
+
     }
 
     public void initBoxes() {
         boxes = new ArrayList<>();
-        boxes.add(new Box(500,500, 1));
-        boxes.add(new Box(400,400, 1));
+        boxes.add(new Box(500,500, 3));
+        boxes.add(new Box(400,400, 4));
+
     }
 
     @Override
@@ -57,7 +63,23 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     }
     private void drawObjects(Graphics g) {
         for (Box b : boxes) {
-            g.drawRect(b.getX(), b.getY(), b.height, b.width);
+            switch (b.level%5) {
+                case 1 : g.setColor(Color.CYAN);
+                    break;
+                case 2 : g.setColor(Color.MAGENTA);
+                    break;
+                case 3 : g.setColor(Color.RED);
+                    break;
+                case 4 : g.setColor(Color.YELLOW);
+                    break;
+                case 0 : g.setColor(Color.GREEN);
+                    break;
+            }
+            g.fillRect(b.getX(), b.getY(), b.height, b.width);
+
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("TimesRoman", Font.PLAIN, 16));
+            g.drawString("Cubes : " + boxes.size(), 50,50);
         }
     }
 
@@ -86,6 +108,18 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
 
             Box m = boxes.get(i);
 
+            if (m.x > B_WIDTH - m.width) {
+                m.x = B_WIDTH - m.width;
+            }
+            else if (m.x < 0) {
+                m.x = 0;
+            }
+            else if (m.y < 0) {
+                m.y = 0;
+            }
+            else if (m.y > B_HEIGHT - m.height) {
+                m.y = B_HEIGHT - m.height;
+            }
             if (m.isVisible()) {
 
             } else {
@@ -106,10 +140,17 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
             boxes.add(new Box( 100, 100, 1));
         }
     }
+
+    private void calcCoins() {
+
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         collisions();
         update();
+        if (count == 60) {
+            calcCoins();
+        }
         if(count == 120) {
             spawnBox();
         }
@@ -118,7 +159,6 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     }
 
     public void mousePressed(MouseEvent e) {
-        System.out.println("Pressed");
         for (Box b : boxes) {
             Rectangle x = b.getBounds();
             if (x.contains(new Point(e.getX(), e.getY()))) {
@@ -130,7 +170,6 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
         }
     }
     public void mouseReleased(MouseEvent e) {
-        System.out.println("Released");
         drag = false;
         dragging = null;
     }
@@ -147,10 +186,11 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
 
     }
     public void mouseDragged(MouseEvent e) {
-        System.out.println("X : " + e.getX() + "Y : " + e.getY());
         try {
-            dragging.x = e.getX() - offsetX;
-            dragging.y = e.getY() - offsetY;
+            if (dragging != null) {
+                dragging.x = e.getX() - offsetX;
+                dragging.y = e.getY() - offsetY;
+            }
         } catch (Exception e1) {
             e1.printStackTrace();
         }

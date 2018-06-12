@@ -4,8 +4,9 @@ public class Box extends Sprite{
 
     public  Box (int x, int y, int level) {
         super(x,y);
-        width = 20 * level /2;
-        height = 20 * level /2;
+
+        width = 30 * level / 4;
+        height = 30 * level / 4;
         this.level = level;
     }
 }
