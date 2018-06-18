@@ -8,7 +8,7 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
     private Timer timer;
     private boolean ingame;
     private final int B_WIDTH = 1920;
-    private final int B_HEIGHT = 880;
+    private final int B_HEIGHT = 860;
     private final int DELAY = 16;
     ArrayList<Box> boxes;
     ArrayList<CubeCreator> creators;
@@ -42,10 +42,17 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
 
     private void initMenus() {
         JPanel temp = new JPanel();
+        GridLayout grid = new GridLayout(3,16);
+        temp.setLayout(grid);
+        for (int i = 0; i < 48; i++) {
+            JButton label = new JButton(Integer.toString(i));
+            label.setBackground(Color.RED);
+            temp.add(label);
+        }
         temp.setBackground(Color.DARK_GRAY);
-        JButton button = new JButton("Button");
-        temp.add(button);
-        temp.setBounds(0, 880, 1920, 200);
+        /**JButton button = new JButton("Button");
+        temp.add(button);**/
+        temp.setBounds(0, 860, 1920, 200);
         this.add(temp);
     }
 
@@ -87,6 +94,8 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
                     break;
             }
             g.fillRect(b.getX(), b.getY(), b.height, b.width);
+            g.setColor(Color.BLACK);
+            g.drawRect(b.getX(), b.getY(), b.height, b.width);
         }
 
         g.setColor(Color.WHITE);
@@ -139,6 +148,10 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
             }
             else if (m.y > B_HEIGHT - m.height) {
                 m.y = B_HEIGHT - m.height;
+            }
+
+            if(!m.spawning) {
+                m.animate();
             }
             if (m.isVisible()) {
 
@@ -209,7 +222,15 @@ public class Board extends JPanel implements ActionListener, MouseListener, Mous
 
     }
     public void mouseClicked(MouseEvent e) {
-        System.out.println("cicked");
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            System.out.println("Left Click");
+        }
+        if (e.getButton() == MouseEvent.BUTTON2) {
+            System.out.println("Middle Click");
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            System.out.println("Right Click");
+        }
     }
     public void mouseDragged(MouseEvent e) {
         try {
